@@ -3,7 +3,7 @@ import Comparator = require('./comparator');
 import SemVer = require('./semver');
 
 declare class Range {
-    constructor(range: string | Range, optionsOrLoose?: boolean | semver.RangeOptions);
+    constructor(range: string | Range, optionsOrLoose?: boolean | semver.Options);
 
     range: string;
     raw: string;

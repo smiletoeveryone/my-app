@@ -1,0 +1,46 @@
+@font-face {
+  font-family: "Hacker";
+  src: url("../public/fonts/GruppeA.ttf");
+}
+
+@font-face {
+  font-family: "Dax";
+  src: url("../public/fonts/Dax.ttf");
+}
+
+@font-face {
+  font-family: "Dahlia";
+  src: url("../public/fonts/dahlia-regular.otf");
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.react-images__view-wrapper img {
+  margin: 0 auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.walletconnect-qrcode-modal {
+}
+
+.walletconnect-modal__base {
+  color: black !important;
+}
+
+.walletconnect-search__input::placeholder {
+  color: #999 !important;
+}

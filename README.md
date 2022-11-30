@@ -1,71 +1,190 @@
-# Getting Started with Create React App
+# 🦁 Metalion Redemption UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repo is built with NextJS + ChakraUI / Deployed on Vercel
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+Create a `.env.local` and copy the necessary `ENV` variables inside `.env.sample`.
 
-### `npm start`
+To run the development server:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+npm run dev
+# or
+yarn dev
+```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Deployment
 
-### `npm test`
+We have configured two urls for `prod` and `staging`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `prod`: https://metalion.mtrs.io uses `polygon` mainnet - `matic`
+- `staging` https://test-metalion.mtrs.io uses `polygon` testnet - `mumbai`
 
-### `npm run build`
+## Flow Diagram
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![image](https://user-images.githubusercontent.com/4248780/167772031-60e52322-ac68-465d-a26c-9aea3373c2e4.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Currently wrapping REDREAMER APIs: [https://docs.redreamer.io/re-dreamer-labs-product/auth](https://docs.redreamer.io/re-dreamer-labs-product/auth)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+All authenticated APIs requires token set  as bearer token on `Authorization` header.
 
-### `npm run eject`
+### GET /v1/redeem/nonce
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+This API is to get the nonce to sign with MetaMask, then send it to Login API to complete authentication.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### Response
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```json
+{
+  "nonce": "bf855163-7182-47a7-a1bf-f3beb12f68d9"
+}
+```
 
-## Learn More
+### POST /v1/redeem/login
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This API takes the nonce from previous API and complete the login on REDREAMER side. It will get the necessary tokens and set as Secure Cookie in the response. 
 
-### Code Splitting
+🚨 Browser should save the secure cookies, and will use for subsequent requests
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### Request
 
-### Analyzing the Bundle Size
+```json
+{
+	"network": "polygon",
+	"address": "0x68ef21de728d15af762ce33067290dd7368f71d7",
+	"signature": "0xa9940ea1208abc0f9450abff4579507122c2f26dae2e83c62a746ac27de2e043181f54469a08d7ee16bb501094795a22d9c44bdd39421dc963a5a1d40cfc48cc1c"
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+#### Response
 
-### Making a Progressive Web App
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg2OGVmMjFkZTcyOGQxNWFmNzYyY2UzMzA2NzI5MGRkNzM2OGY3MWQ3IiwiZXhwIjoxNjUxODEzMjEyLCJpYXQiOjE2NTE3MjY4MTIsImlzcyI6InJlZHJlYW1lciIsInNjb3BlcyI6IiJ9.x-6A7eSC7VjexKMECIN86q0QwS9lLz8bh8-B4zxstbOXamnWBvs41wT4ojerv1O5-JFQcAX0On7Qv5s3gwNuwA",
+  "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg2OGVmMjFkZTcyOGQxNWFmNzYyY2UzMzA2NzI5MGRkNzM2OGY3MWQ3IiwiZXhwIjoxNjUxNzMwNDEyLCJpYXQiOjE2NTE3MjY4MTIsImlzcyI6InJlZHJlYW1lciIsInNjb3BlcyI6IiJ9.JL6JoL5YHvuXzYcou_6Y7dDXE4d-jfogXsBQP4XmkE_VBJ578GDyEgfsHIvjaIXKLvb7xbdMEIr6TCvE7Rcxsg"
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### POST /v1/redeem/refresh
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Use Refresh Token to exchange for new pair of Refresh Token and Token
 
-### Deployment
+#### Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg2OGVmMjFkZTcyOGQxNWFmNzYyY2UzMzA2NzI5MGRkNzM2OGY3MWQ3IiwiZXhwIjoxNjUxODEzMjEyLCJpYXQiOjE2NTE3MjY4MTIsImlzcyI6InJlZHJlYW1lciIsInNjb3BlcyI6IiJ9.x-6A7eSC7VjexKMECIN86q0QwS9lLz8bh8-B4zxstbOXamnWBvs41wT4ojerv1O5-JFQcAX0On7Qv5s3gwNuwA",
+  "address": ""
+}
+```
 
-### `npm run build` fails to minify
+#### Response
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# my-app
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg2OGVmMjFkZTcyOGQxNWFmNzYyY2UzMzA2NzI5MGRkNzM2OGY3MWQ3IiwiZXhwIjoxNjUxODEzMjEyLCJpYXQiOjE2NTE3MjY4MTIsImlzcyI6InJlZHJlYW1lciIsInNjb3BlcyI6IiJ9.x-6A7eSC7VjexKMECIN86q0QwS9lLz8bh8-B4zxstbOXamnWBvs41wT4ojerv1O5-JFQcAX0On7Qv5s3gwNuwA",
+  "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg2OGVmMjFkZTcyOGQxNWFmNzYyY2UzMzA2NzI5MGRkNzM2OGY3MWQ3IiwiZXhwIjoxNjUxNzMwNDEyLCJpYXQiOjE2NTE3MjY4MTIsImlzcyI6InJlZHJlYW1lciIsInNjb3BlcyI6IiJ9.JL6JoL5YHvuXzYcou_6Y7dDXE4d-jfogXsBQP4XmkE_VBJ578GDyEgfsHIvjaIXKLvb7xbdMEIr6TCvE7Rcxsg"
+}
+```
+
+### GET /v1/redeem/tokens
+
+---
+
+This API is the core that utilizes REDREAMER’s campaign and NFT APIs, consolidate the results into single API that builds the relationship between the two. This helps skipping an API call in the frontend and enables multi-select campaign for a particular NFT. 
+
+#### Response
+
+```json
+{
+  "campaign_id": "16672c3c-e3cb-4db4-8406-f0d3c0073c03",
+  "tokens": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "network": "polygon",
+      "contract_address": "0xe3f08b6fe26d0057e310185481bb30b02c5aee25",
+      "token_id": 1,
+      "name": "Metalion getting coffee",
+      "description": "宙獅計劃的起源，加入我們一起探索宙獅宇宙吧",
+      "image": "https://metalion.s3.ap-northeast-1.amazonaws.com/nft-image.png"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "network": "polygon",
+      "contract_address": "0xe3f08b6fe26d0057e310185481bb30b02c5aee25",
+      "token_id": 19,
+      "name": "Metalion getting coffee",
+      "description": "宙獅計劃的起源，加入我們一起探索宙獅宇宙吧",
+      "image": "https://metalion.s3.ap-northeast-1.amazonaws.com/nft-image.png"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "network": "polygon",
+      "contract_address": "0xe3f08b6fe26d0057e310185481bb30b02c5aee25",
+      "token_id": 17,
+      "name": "Metalion getting coffee",
+      "description": "宙獅計劃的起源，加入我們一起探索宙獅宇宙吧",
+      "image": "https://metalion.s3.ap-northeast-1.amazonaws.com/nft-image.png"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "network": "polygon",
+      "contract_address": "0xe3f08b6fe26d0057e310185481bb30b02c5aee25",
+      "token_id": 18,
+      "name": "Metalion getting coffee",
+      "description": "宙獅計劃的起源，加入我們一起探索宙獅宇宙吧",
+      "image": "https://metalion.s3.ap-northeast-1.amazonaws.com/nft-image.png"
+    }
+  ],
+  "redeem_otpions": [
+    {
+      "option_id": "AMERICANO",
+      "option_display": "Americano"
+    },
+    {
+      "option_id": "LATTE",
+      "option_display": "Latte"
+    }
+  ]
+}
+```
+
+### POST /v1/redeem
+
+---
+
+#### Request
+
+```json
+{
+	"campaign_id": "UUID",
+	"contract_address": "0xe3f08b6fe26d0057e310185481bb30b02c5aee25",
+	"token_id": 20,
+	"signature": "0xfc83c6909c52da77faad349e9593595500bfcac09ff6dbc37c5f8977cd0968a11ce2054e82ffa799daac53a3070b3be7abd441b1e36c09c35446aa3146d0279c1c",
+	"redeem_option_id": "LATTE"
+}
+```
+
+#### Response
+
+```json
+{
+  "after_requested": 0,
+  "created_at": "2022-05-07T18:22:34.308321462Z",
+  "qr_code": "REDREAMER:eyJuZXR3b3JrIjoicG9seWdvbiIsImNhbXBhaWduX2lkIjoiMTY2NzJjM2MtZTNjYi00ZGI0LTg0MDYtZjBkM2MwMDczYzAzIiwiY29udHJhY3RfYWRkcmVzcyI6IjB4ZTNmMDhiNmZlMjZkMDA1N2UzMTAxODU0ODFiYjMwYjAyYzVhZWUyNSIsInRva2VuX2lkIjoxNywicmVxdWVzdGVyX2FkZHJlc3MiOiIweDY4ZWYyMWRlNzI4ZDE1YWY3NjJjZTMzMDY3MjkwZGQ3MzY4ZjcxZDciLCJoYXNoIjoiOWIxZDM2N2QtODJjZS00ZGU5LWFiZmMtNTk2OWRiZjA1MTFlIn0=",
+  "redeemed_description": "redeemed!",
+  "requested_description": "requested!"
+}
+```
+
+Status Code
+
+- 400 - `EXCEED_MAXIMUM_PASSPORT_REDEMPTION` when NFT is redeemed already
